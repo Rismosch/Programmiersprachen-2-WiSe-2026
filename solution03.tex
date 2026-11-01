@@ -1,0 +1,184 @@
+\documentclass[13pt, a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bussproofs}
+\usepackage{fancyhdr}
+\usepackage[margin=3cm]{geometry}
+\usepackage{mathpartir}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header: left, center, right
+\fancyhead[L]{Programming Languages 2}
+\fancyhead[C]{Homework 03}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+Simon Sutoris 7542170
+
+%===============================================================================
+\section*{Task 1: Evaluation of Untyped Lambda Calculus}
+%===============================================================================
+
+\subsection*{1.}
+\[
+\begin{array}{llr}
+& (\lambda x.\lambda y.y)\ (\lambda a.a\ a) \\
+\to & \lambda y.y \\
+\end{array}
+\]
+
+\subsection*{2.}
+\[
+\begin{array}{llr}
+& ((\lambda x.\lambda y.x\ y)\ (\lambda z.\lambda w.w))\ (\lambda a.a\ a) \\
+\to & (\lambda y.(\lambda z.\lambda w.w)\ y)\ (\lambda a.a\ a) \\
+\to & (\lambda z.\lambda w.w)\ (\lambda a.a\ a)\\
+\to & \lambda w.w \\
+\end{array}
+\]
+
+%===============================================================================
+\section*{Task 2: Church encoding}
+%===============================================================================
+
+\subsection*{1.} %==============================================================
+
+\[
+\begin{aligned}
+\texttt{sum\_leaves} &= \texttt{fold}\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ (\lambda v.v) \\
+&= (\lambda f.\lambda g.\lambda t.t\ f\ g)\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ (\lambda v.v) \\
+&\to (\lambda g.\lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ g)\ (\lambda v.v) \\
+&\to \lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ (\lambda v.v) \\
+\end{aligned}
+\]
+
+Applied to the example tree:
+
+\[
+\begin{array}{llr}
+& \texttt{sum\_leaves}\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to^* & (\lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ (\lambda v.v))\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to & (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2))\ (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ (\lambda v.v) \\
+\to & (\lambda g.(\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2))\ (\lambda v.v) \\
+\to & (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v_1\ ((\lambda v.v)\ v_{11})\ ((\lambda v.v)\ v_{12}))\ ((\lambda v.v)\ v_2) \\
+\to^* & (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v_1\ v_{11}\ v_{12})\ v_2 \\
+%\to^* & (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ ((\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v_{11}\ v_{12})\ v_2 \\
+%\to^* & (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ ((\lambda r.\texttt{plus}\ v_{11}\ r)\ v_{12})\ v_2 \\
+\to^* & (\lambda v.\lambda l. \lambda r.\texttt{plus}\ l\ r)\ v\ (\texttt{plus}\ v_{11}\ v_{12})\ v_2 \\
+\to^* & \texttt{plus}\ (\texttt{plus}\ v_{11}\ v_{12})\ v_2 \\
+\end{array}
+\]
+
+
+\subsection*{2.} %==============================================================
+\[
+\begin{aligned}
+\texttt{map} &= \lambda f.\lambda t.t\ f \\
+\end{aligned}
+\]
+
+Applied to the example tree:
+
+\[
+\begin{array}{llr}
+& \texttt{map}\ f'\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to & (\lambda f.\lambda t.t\ f)\ f'\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to & (\lambda t.t\ f') (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to & (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2))\ f' \\
+\to & \lambda g.f'\ v\ (f'\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2) \\
+\end{array}
+\]
+
+\subsection*{3.} %==============================================================
+\[
+\begin{aligned}
+\texttt{size} &= \texttt{fold}\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ (\lambda v.c_1) \\
+&\to (\lambda f.\lambda g.\lambda t.t\ f\ g)\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ (\lambda v.c_1) \\
+&\to (\lambda g.\lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ g)\ (\lambda v.c_1) \\
+&\to \lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ (\lambda v.c_1) \\
+\end{aligned}
+\]
+
+Applied to the example tree:
+
+\[
+\begin{array}{llr}
+& \texttt{size}\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to^* & (\lambda t.t\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ (\lambda v.c_1))\ (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2)) \\
+\to & (\lambda f.\lambda g.f\ v\ (f\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2))\ (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ (\lambda v.c_1) \\
+\to & (\lambda g.(\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v_1\ (g\ v_{11})\ (g\ v_{12}))\ (g\ v_2))\ (\lambda v.c_1) \\
+\to & (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v_1\ ((\lambda v.c_1)\ v_{11})\ ((\lambda v.c_1)\ v_{12}))\ ((\lambda v.c_1)\ v_2) \\
+\to^* & (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v\ ((\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v_1\ c_1\ c_1)\ c_1 \\
+\to^* & (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v\ (\texttt{scc}\ \texttt{plus}\ c_1\ c_1)\ c_1 \\
+\to^* & (\lambda v.\lambda l. \lambda r.\texttt{scc}\ \texttt{plus}\ l\ r)\ v\ c_3\ c_1 \\
+\to^* & \texttt{scc}\ \texttt{plus}\ c_3\ c_1 \\
+\to^* & c_5 \\
+\end{array}
+\]
+
+%===============================================================================
+\section*{Task 3: Call-by-name lambda calculus}
+%===============================================================================
+
+\subsection*{Inference rules} %=================================================
+
+\subsubsection*{Call-by-value}
+\[
+(\lambda x.t_1)\ ((\lambda y.t_2)\ t_3) \to (\lambda x.t_1)\ [y \mapsto t_3]t_2
+\]
+
+\subsubsection*{Call-by-name}
+\[
+(\lambda x.t_1)\ ((\lambda y.t_2)\ t_3) \to [x \mapsto ((\lambda y.t_2)\ t_3)]t_1
+\]
+
+\subsection*{Evaluation} %======================================================
+
+\subsubsection*{Call-by-value}
+\[
+\begin{array}{llr}
+& (\lambda f.\lambda v. v\ v)\ ((\lambda x.x)\ (\lambda y.\lambda z.y))\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda f.\lambda v. v\ v)\ (\lambda y.\lambda z.y)\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda v. v\ v)\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda v. v\ v)\ ((\lambda y.y)\ (\lambda y.y)) \\
+\to & (\lambda v. v\ v)\ (\lambda y.y) \\
+\to & (\lambda y.y)\ (\lambda y.y) \\
+\to & \lambda y.y \\
+\end{array}
+\]
+
+\subsubsection*{Call-by-name}
+\[
+\begin{array}{llr}
+& (\lambda f.\lambda v. v\ v)\ ((\lambda x.x)\ (\lambda y.\lambda z.y))\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda v. v\ v)\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & ((\lambda a.a\ a)\ (\lambda y.y))\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & ((\lambda y.y)\ (\lambda y.y))\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda y.y)\ ((\lambda a.a\ a)\ (\lambda y.y)) \\
+\to & (\lambda a.a\ a)\ (\lambda y.y) \\
+\to & (\lambda y.y)\ (\lambda y.y) \\
+\to & \lambda y.y \\
+\end{array}
+\]
+
+\subsection*{Up- and downsides} %===============================================
+
+Cbv is strict, while cbn is non-strict or lazy. Lazy evaluation can skip evaluation steps, when they are not needed. If an argument would loop, as for example in $\texttt{omega} = (\lambda x.x\ x)\ (\lambda x.x\ x)$, lazy evaluation could skip it, while strict evaluation would get stuck. Also, in a higher order language, a given function may produce side effects. In lazy-evaluation, due to skipping, in certain functions they may not be produced. In strict evaluation they are. Whether that is a good thing or not, is up for debate. Most higher order languages opt for cbv.
+
+%===============================================================================
+\section*{Task 4}
+%===============================================================================
+
+No questions.
+
+\end{document}
