@@ -1,0 +1,241 @@
+\documentclass[13pt, a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bussproofs}
+\usepackage{fancyhdr}
+\usepackage[margin=3cm]{geometry}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header: left, center, right
+\fancyhead[L]{Programming Languages 2}
+\fancyhead[C]{Homework 04}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+Simon Sutoris 7542170
+
+%===============================================================================
+\section*{1 Typing}
+%===============================================================================
+
+\subsection*{1.} %==============================================================
+
+\begin{prooftree}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Fl}(1) : \texttt{Fl}}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{\texttt{pow}(\texttt{Fl}(5), \texttt{Fl}(0.5)) : \texttt{Fl}}
+  \BinaryInfC{\texttt{Fl}(1) + \texttt{pow}(\texttt{Fl}(5), \texttt{Fl}(0.5)) : \texttt{Fl}}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Fl}(2) : \texttt{Fl}}
+  \BinaryInfC{(\texttt{Fl}(1) + \texttt{pow}(\texttt{Fl}(5), \texttt{Fl}(0.5))) / \texttt{Fl}(2) : \texttt{Fl}}
+\end{prooftree}
+
+The term is ill-typed, as \textsc{Ty-Pow} requires $t_2 : \texttt{Int}$, but $t_2 = \texttt{Fl}(0.5) : \texttt{Fl}$.
+
+\subsection*{2.} %==============================================================
+
+\begin{prooftree}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Fl}(3) : \texttt{Fl}}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Int}(4) : \texttt{Int}}
+  \UnaryInfC{\texttt{AsFloat}(\texttt{Int}(4)) : \texttt{Fl}}
+  \BinaryInfC{\texttt{Fl}(3)\ast\texttt{AsFloat}(\texttt{Int}(4)) : \texttt{Fl}}
+  \UnaryInfC{\texttt{round}(\texttt{Fl}(3)\ast\texttt{AsFloat}(\texttt{Int}(4))) : \texttt{Int}}
+\end{prooftree}
+
+\subsection*{3.} %==============================================================
+
+\begin{prooftree}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Int}(2) : \texttt{Int}}
+  \UnaryInfC{texttt{AsFloat}(\texttt{Int}(2)) : \texttt{Fl}}
+  \AxiomC{}
+  \UnaryInfC{\texttt{Int}(64) : Int}
+  \BinaryInfC{\texttt{pow}(\texttt{AsFloat}(\texttt{Int}(2)), \texttt{Int}(64)) : \texttt{Fl}}
+\end{prooftree}
+
+\subsection*{4.} %==============================================================
+
+\begin{prooftree}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{\texttt{Fl}(4)/\texttt{Int}(2) : $\lightning$}
+\end{prooftree}
+
+The term is ill-typed, as \textsc{Ty-BinOp} requires the types $t_1 : \tau$ and $t_2 : \tau$ to be equal, but $t_1 = \texttt{Fl}(4) : \texttt{Fl}$ has a different type than $t_2 = \texttt{Int}(2) : \texttt{Int}$
+
+%===============================================================================
+\section*{2 Progress and Preservation}
+%===============================================================================
+
+\subsection*{Theorem 1 \textmd{Preservation}} %=================================
+
+\subsubsection*{\textmd{\textsc{E-FlOp}}}
+\begin{align}
+t_1 &= \texttt{Fl}(f_1) \oplus \texttt{Fl}(f_2) : \texttt{Fl} \\
+t_2 &= \texttt{Fl}(f_1 \oplus f_2) : \texttt{Fl}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-IntOp}}}
+\begin{align}
+t_1 &= \texttt{Int}(i_1) \oplus \texttt{Int}(i_2) : \texttt{Int} \\
+t_2 &= \texttt{Int}(i_1 \oplus i_2) : \texttt{Int}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-RoundFl}}}
+\begin{align}
+t_1 &= \texttt{round}(\texttt{Fl}(f)) : \texttt{Int} \\
+t_2 &= \texttt{Int}(\lfloor f\rceil) : \texttt{Int}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-IntFl}}}
+\begin{align}
+t_1 &= \texttt{AsFloat}(\texttt{Int}(i)) : \texttt{Fl} \\
+t_2 &= \texttt{Fl}(i) : \texttt{Fl}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-PowFl}}}
+\begin{align}
+t_1 &= \texttt{pow}(\texttt{Fl}(f),\texttt{Int}(i)) : \texttt{Fl} \\
+t_2 &= \texttt{Fl}(f^i) : \texttt{Fl}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-PowInt}}}
+\begin{align}
+t_1 &= \texttt{pow}(\texttt{Int}(i_1),\texttt{Int}(i_2)) : \texttt{Fl} \\
+t_2 &= \texttt{Fl}(i_1^{i_2}) : \texttt{Fl}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-BinOp1}}}
+Due to \textsc{Ty-BinOp}, $\oplus$ has the same type as its operands. Due to \textsc{E-FlOp}, \textsc{E-IntOp}, \textsc{E-RoundFl}, \textsc{E-IntFL}, \textsc{E-PowFl} and \textsc{E-PowInt}, $t_1$ and $t_1'$ in $t_1 \mapsto t_2$ have the same type $\tau$. Therefore $t_1 \oplus t_2$ and $t_1' \oplus t_2$ have the same type $\tau$. $\square$
+
+\subsubsection*{\textmd{\textsc{E-BinOp2}, \textsc{E-Round}, \textsc{E-AsFloat}, \textsc{E-Pow1}, \textsc{E-Pow2}}}
+Analog to \textsc{E-BinOp1}.
+
+$\blacksquare$
+
+\subsection*{Theorem 2 \textmd{Progress}} %=====================================
+
+\subsubsection*{\textmd{\textsc{Ty-Int}, \textsc{Ty-BinOp}, \textsc{Ty-Float}, \textsc{Ty-Round}, \textsc{Ty-ToFloat}, \textsc{Ty-Pow}}}
+
+These rules are all values. $\square$
+
+\subsubsection*{\textmd{\textsc{E-FlOp}, \textsc{E-IntOp}, \textsc{E-RoundFl}, \textsc{E-IntFl}, \textsc{E-PowFl}, \textsc{E-PowInt}}}
+
+These rules are all reducible terms. $\square$
+
+\subsubsection*{\textmd{\textsc{E-BinOp1}}}
+
+\textbf{IA}: $t_1$ is a value, i.e. not reducible: $t_1 =t_1'$. Therefore $t_1 \oplus t_2 = t_1' \oplus t_2$.
+
+\noindent \textbf{IS}: $t_1$ is reducible. $\square$
+
+\subsubsection*{\textmd{\textsc{E-BinOp2}, \textsc{E-Round}, \textsc{E-AsFloat}, \textsc{E-Pow1}, \textsc{E-Pow2}}}
+Analog to \textsc{E-BinOp1}.
+
+$\blacksquare$
+
+%===============================================================================
+\section*{3 Designing a type system}
+%===============================================================================
+
+\subsection*{1.} %==============================================================
+
+\begin{array}{lrr}
+t & := & \\
+& & \texttt{Int}(n) \\
+& | & \texttt{List}(\texttt{Nil}) \\
+& | & \texttt{Cons}(t, t) \\
+& | & \texttt{tail}(t, t) \\
+& | & \texttt{succ}(t, t) \\
+& | & \texttt{pred}(t, t) \\
+\end{array}
+
+\begin{prooftree}
+  \AxiomC{}
+  \RightLabel{\textsc{Ty-Int}}
+  \UnaryInfC{\texttt{Int}(n): \texttt{Int}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{}
+  \RightLabel{\textsc{Ty-Nil}}
+  \UnaryInfC{\texttt{List}(\texttt{Nil}): \texttt{List}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$t_1$ : \texttt{Int}}
+  \AxiomC{$t_2$ : \texttt{List}}
+  \RightLabel{\textsc{Ty-Cons}}
+  \BinaryInfC{\texttt{Cons}($t_1$, $t_2$): \texttt{List}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{t : \texttt{List}}
+  \RightLabel{\textsc{Ty-Tail}}
+  \UnaryInfC{\texttt{tail}(t): \texttt{List}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{t : \texttt{Int}}
+  \RightLabel{\textsc{Ty-Succ}}
+  \UnaryInfC{\texttt{succ}(t): \texttt{Int}}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{t : \texttt{Int}}
+  \RightLabel{\textsc{Ty-Pred}}
+  \UnaryInfC{\texttt{pred}(t): \texttt{Int}}
+\end{prooftree}
+
+\subsection*{2.} %==============================================================
+
+\begin{array}{rlr}
+\texttt{tail}(\texttt{Cons}(\texttt{Int}(n), \texttt{List}(vl))) & \mapsto \texttt{List}(vl) & \textsc{Ty-TailCons}
+\end{array}
+
+\subsection*{3.} %==============================================================
+
+\subsubsection*{Progress}
+
+TODO
+
+\subsubsection*{Preservation}
+TODO
+
+%===============================================================================
+\section*{4 Types and Programming Languages}
+%===============================================================================
+
+No questions.
+
+%===============================================================================
+\section*{5 Nameless Representations}
+%===============================================================================
+
+\begin{enumerate}
+\item $\lambda.\lambda.1\,0$
+\item $\lambda.2\,(\lambda.\lambda.1)$
+\item $\lambda.((\lambda.2)\,(\lambda.0))$
+\end{enumerate}
+
+\end{document}
