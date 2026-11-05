@@ -83,6 +83,12 @@ The term is ill-typed, as \textsc{Ty-BinOp} requires the types $t_1 : \tau$ and 
 
 \subsection*{Theorem 1 \textmd{Preservation}} %=================================
 
+\subsubsection*{\textmd{\textsc{Ty-Int}}}
+Term is a value. $\square$
+
+\subsubsection*{\textmd{\textsc{Ty-BinOp}, \textsc{Ty-Float}, \textsc{Ty-Round}, \textsc{Ty-ToFloat}, \textsc{Ty-Pow}}}
+Analog to \texttt{Ty-Int}.
+
 \subsubsection*{\textmd{\textsc{E-FlOp}}}
 \begin{align}
 t_1 &= \texttt{Fl}(f_1) \oplus \texttt{Fl}(f_2) : \texttt{Fl} \\
@@ -131,7 +137,7 @@ Due to \textsc{Ty-BinOp}, $\oplus$ has the same type as its operands. Due to \te
 \subsubsection*{\textmd{\textsc{E-BinOp2}, \textsc{E-Round}, \textsc{E-AsFloat}, \textsc{E-Pow1}, \textsc{E-Pow2}}}
 Analog to \textsc{E-BinOp1}.
 
-$\blacksquare$
+\noindent$\blacksquare$
 
 \subsection*{Theorem 2 \textmd{Progress}} %=====================================
 
@@ -152,7 +158,7 @@ These rules are all reducible terms. $\square$
 \subsubsection*{\textmd{\textsc{E-BinOp2}, \textsc{E-Round}, \textsc{E-AsFloat}, \textsc{E-Pow1}, \textsc{E-Pow2}}}
 Analog to \textsc{E-BinOp1}.
 
-$\blacksquare$
+\noindent$\blacksquare$
 
 %===============================================================================
 \section*{3 Designing a type system}
@@ -230,14 +236,64 @@ t & := & \\
 Term is a value. $\square$
 
 \subsubsection*{\textmd{\textsc{Ty-Nil}, \textsc{Ty-Cond}, \textsc{Ty-Tail}, \textsc{Ty-Succ}, \textsc{Ty-Pred}}}
-Analog to \texttt{Ty-Int}. $\square$
+Analog to \texttt{Ty-Int}.
 
-TODO
+\subsubsection*{\textmd{\textsc{Ty-TailCons}}}
+\begin{align}
+t_1 &= \texttt{Cons}(\texttt{Int}(n), \texttt{List}(vl))) : \texttt{List} \\
+t_2 &= \texttt{List}(vl) : \texttt{List}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
 
+\subsubsection*{\textmd{\textsc{Ty-TailNil}}}
+\begin{align}
+t_1 &= \texttt{tail}(\texttt{List}(\texttt{Nil})) : \texttt{List} \\
+t_2 &= \texttt{List}(\texttt{Nil}) : \texttt{List}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{Ty-SuccOp}}}
+\begin{align}
+t_1 &= \texttt{succ}(\texttt{Int}(n)) : \texttt{Int} \\
+t_2 &= \texttt{Int}(n + 1) : \texttt{List}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{Ty-PredOp}}}
+\begin{align}
+t_1 &= \texttt{pred}(\texttt{Int}(n)) : \texttt{Int} \\
+t_2 &= \texttt{Int}(n - 1) : \texttt{List}
+\end{align}
+Types of $t_1$ and $t_2$ match. $\square$
+
+\subsubsection*{\textmd{\textsc{E-Cons1}}}
+Due to \textsc{Ty-TailCons}, \textsc{Ty-TailNil}, \textsc{Ty-SuccOp} and \textsc{Ty-PredOp}, $t_1$ and $t_1'$ in $t_1 \mapsto t_2$ have the same type $\tau$. Therefore $\texttt{Cons}(t_1, t_2)$ and $\texttt{Cons}(t_1', t_2)$ have the same type $\tau$. $\square$
+
+\subsubsection*{\textmd{\textsc{E-Cons2}, \textsc{E-Tail}, \textsc{E-Succ}, \textsc{E-Pred}}}
+Analog to \textsc{E-Cons1}.
+
+\noindent$\blacksquare$
 
 \subsection*{3. Progress} %=====================================================
 
-TODO
+\subsubsection*{\textmd{\textsc{Ty-Int}, \textsc{Ty-Nil}, \textsc{Ty-Cons}, \textsc{Ty-Tail}, \textsc{Ty-Succ}, \textsc{Ty-Pred}}}
+
+These rules are all values. $\square$
+
+\subsubsection*{\textmd{\textsc{Ty-TailCons}, \textsc{Ty-TailNil}, \textsc{Ty-SuccOp}, \textsc{Ty-PredOp}}}
+
+These rules are all reducible terms. $\square$
+
+\subsubsection*{\textmd{\textsc{E-Cons1}}}
+
+\textbf{IA}: $t_1$ is a value, i.e. not reducible: $t_1 =t_1'$. Therefore $\texttt{Cons}(t_1, t_2) = \texttt{Cons}(t_1', t_2)$.
+
+\noindent \textbf{IS}: $t_1$ is reducible. $\square$
+
+\subsubsection*{\textmd{\textsc{E-Cons2}, \textsc{E-Tail}, \textsc{E-Succ}, \textsc{E-Pred}, \textsc{E-Pow2}}}
+Analog to \textsc{E-Cons1}.
+
+\noindent$\blacksquare$
 
 %===============================================================================
 \section*{4 Types and Programming Languages}
