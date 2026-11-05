@@ -160,6 +160,8 @@ $\blacksquare$
 
 \subsection*{1.} %==============================================================
 
+\begin{center}
+\[
 \begin{array}{lrr}
 t & := & \\
 & & \texttt{Int}(n) \\
@@ -169,6 +171,8 @@ t & := & \\
 & | & \texttt{succ}(t, t) \\
 & | & \texttt{pred}(t, t) \\
 \end{array}
+\]
+\end{center}
 
 \begin{prooftree}
   \AxiomC{}
@@ -209,17 +213,30 @@ t & := & \\
 
 \subsection*{2.} %==============================================================
 
-\begin{array}{rlr}
-\texttt{tail}(\texttt{Cons}(\texttt{Int}(n), \texttt{List}(vl))) & \mapsto \texttt{List}(vl) & \textsc{Ty-TailCons}
+\begin{center}
+\[
+\begin{array}{rcll}
+\texttt{tail}(\texttt{Cons}(\texttt{Int}(n), \texttt{List}(vl))) & \mapsto & \texttt{List}(vl) & \textsc{Ty-TailCons} \\
+\texttt{tail}(\texttt{List}(\texttt{Nil})) & \mapsto & \texttt{List}(\texttt{Nil}) & \textsc{Ty-TailNil} \\
+\texttt{succ}(\texttt{Int}(n)) & \mapsto & \texttt{Int}(n + 1) & \textsc{Ty-SuccOp} \\
+\texttt{succ}(\texttt{Pred}(n)) & \mapsto & \texttt{Int}(n - 1) & \textsc{Ty-PredOp} \\
 \end{array}
+\]
+\end{center}
 
-\subsection*{3.} %==============================================================
+\subsection*{3. Preservation} %=================================================
 
-\subsubsection*{Progress}
+\subsubsection*{\textmd{\textsc{Ty-Int}}}
+Term is a value. $\square$
+
+\subsubsection*{\textmd{\textsc{Ty-Nil}, \textsc{Ty-Cond}, \textsc{Ty-Tail}, \textsc{Ty-Succ}, \textsc{Ty-Pred}}}
+Analog to \texttt{Ty-Int}. $\square$
 
 TODO
 
-\subsubsection*{Preservation}
+
+\subsection*{3. Progress} %=====================================================
+
 TODO
 
 %===============================================================================
