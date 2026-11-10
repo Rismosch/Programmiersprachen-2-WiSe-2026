@@ -1,0 +1,132 @@
+\documentclass[13pt, a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bussproofs}
+\usepackage{fancyhdr}
+\usepackage[margin=3cm]{geometry}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header: left, center, right
+\fancyhead[L]{Programming Languages 2}
+\fancyhead[C]{Homework 05}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+Simon Sutoris 7542170
+
+%===============================================================================
+\section*{1 Simply Typed Lambda Calculus}
+%===============================================================================
+
+\begin{prooftree}
+  \AxiomC{$x: \textbf{A} \in y : \textbf{A}, x: \textbf{A}$}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$y : \textbf{A}, x: \textbf{A} \vdash x : \textbf{A}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$y : \textbf{A} \vdash (\lambda x : \textbf{A}.x) : \textbf{A} \to \textbf{A} $}
+  \AxiomC{$y : \textbf{A} \in y:\textbf{A}$}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$y:\textbf{A} \vdash y : \textbf{A}$}
+  \RightLabel{\textsc{Ty-App}}
+  \BinaryInfC{$y:\textbf{A} \vdash ((\lambda x : \textbf{A}.x)\,y) : \textbf{A}$}
+\end{prooftree}
+
+
+\begin{prooftree}
+  \AxiomC{$y : \textbf{C} \in x : \textbf{B}, y : \textbf{C},z : \textbf{B}, w : \textbf{A}$}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$x : \textbf{B}, y : \textbf{C},z : \textbf{B}, w : \textbf{A} \vdash y : \textbf{C}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$x : \textbf{B}, y : \textbf{C},z : \textbf{B} \vdash (\lambda w : \textbf{A}.y) : \textbf{A} \to \textbf{C}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$x : \textbf{B}, y : \textbf{C} \vdash (\lambda z : \textbf{B}.\lambda w : \textbf{A}.y) : \textbf{B} \to (\textbf{A} \to \textbf{C})$}
+  \AxiomC{$x : \textbf{B} \in x : \textbf{B}, y : \textbf{C}$}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$x : \textbf{B}, y : \textbf{C} \vdash x : \textbf{B}$}
+  \RightLabel{\textsc{Ty-App}}
+  \BinaryInfC{$x : \textbf{B}, y : \textbf{C} \vdash ((\lambda z : \textbf{B}.\lambda w : \textbf{A}.y)\, x) : \textbf{A} \to \textbf{C}$}
+\end{prooftree}
+
+There exist no context $\Gamma$ or type $T$ for the two latter terms $t$ in the exercise. For the first, $w$ is a free variable, and we can't deduce its type without evaluating it. For the latter: $x$ must be of a type, that both: can be evaluated by itself being applied to AND it can be evaluated without a further parameter, as to determine its time. These can't be simultaneously true.
+
+\begin{prooftree}
+  \AxiomC{$z : \textbf{A} \in \Gamma, x : \textbf{B}, y : \textbf{C}, z : \textbf{A} $}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$\Gamma, x : \textbf{B}, y : \textbf{C}, z : \textbf{A} \vdash z : \textbf{A}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$\Gamma, x : \textbf{B}, y : \textbf{C} \vdash (\lambda z : \textbf{A}.z) : \textbf{A} \to \textbf{A}$}
+  %\AxiomC{$(w\,x\,y) : \textbf{A} \in \Gamma, x : \textbf{B}, y : \textbf{C}$}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{$\Gamma, x : \textbf{B}, y : \textbf{C} \vdash (w\,x\,y) : \textbf{A}$}
+  \RightLabel{\textsc{Ty-App}}
+  \BinaryInfC{$\Gamma, x : \textbf{B}, y : \textbf{C} \vdash ((\lambda z : \textbf{A}.z)\,(w\,x\,y)) : \textbf{A}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$\Gamma, x : \textbf{B}\vdash \lambda y : \textbf{C}.((\lambda z : \textbf{A}.z)\,(w\,x\,y)) : \textbf{C} \to \textbf{A}$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$\Gamma \vdash \lambda x : \textbf{B}.\lambda y : \textbf{C}.((\lambda z : \textbf{A}.z)\,(w\,x\,y)) : \textbf{B} \to (\textbf{C} \to \textbf{A})$}
+\end{prooftree}
+
+%\begin{prooftree}
+%  \AxiomC{$x : \texttt{omega} \in x : \texttt{omega}, y : \textbf{A}$}
+%  \RightLabel{\textsc{Ty-Var}}
+%  \UnaryInfC{$x : \texttt{omega}, y : \textbf{A} \vdash x : \texttt{omega}$}
+%  \RightLabel{$\texttt{omega} = (\texttt{omega} \to \texttt{omega})$}
+%  \UnaryInfC{$x : \texttt{omega}, y : \textbf{A} \vdash x : (\texttt{omega} \to \texttt{omega})$}
+%  \AxiomC{$x : \texttt{omega} \in x : \texttt{omega}, y : \textbf{A}$}
+%  \RightLabel{\textsc{Ty-Var}}
+%  \UnaryInfC{$x : \texttt{omega}, y : \textbf{A} \vdash x : \texttt{omega}$}
+%  \RightLabel{\textsc{Ty-App}}
+%  \BinaryInfC{$x : \texttt{omega}, y : \textbf{A} \vdash x\,x : \texttt{omega}$}
+%  \RightLabel{\textsc{Ty-Abs}}
+%  \UnaryInfC{$x : \texttt{omega} \vdash \lambda y : \textbf{A}.x\,x : \textbf{A} \to \texttt{omega}$}
+%\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{$x : \tau', y : \textbf{A} \vdash x : (\tau \to \tau')$}
+  \AxiomC{$x : \tau' \in x : \tau', y : \textbf{A}$}
+  \RightLabel{\textsc{Ty-Var}}
+  \UnaryInfC{$x : \tau', y : \textbf{A} \vdash x : \tau'$}
+  \RightLabel{\textsc{Ty-App}}
+  \BinaryInfC{$x : \tau', y : \textbf{A} \vdash x\,x : \tau'$}
+  \RightLabel{\textsc{Ty-Abs}}
+  \UnaryInfC{$x : \tau* \vdash \lambda y : \textbf{A}.x\,x : \textbf{A} \to \tau'$}
+\end{prooftree}
+
+%===============================================================================
+\section*{2 Extension with Numbers}
+%===============================================================================
+
+TODO
+
+%===============================================================================
+\section*{3 Environments and free variables}
+%===============================================================================
+
+TODO
+
+%===============================================================================
+\section*{4 Compilation to untyped lambda calculus}
+%===============================================================================
+
+TODO
+
+%===============================================================================
+\section*{5 Types and Programming Languages}
+%===============================================================================
+
+No questions.
+
+\end{document}
