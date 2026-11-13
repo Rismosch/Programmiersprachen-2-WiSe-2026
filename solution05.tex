@@ -59,7 +59,9 @@ Simon Sutoris 7542170
   \BinaryInfC{$x : \textbf{B}, y : \textbf{C} \vdash ((\lambda z : \textbf{B}.\lambda w : \textbf{A}.y)\, x) : \textbf{A} \to \textbf{C}$}
 \end{prooftree}
 
-There exist no context $\Gamma$ or type $T$ for the two latter terms $t$ in the exercise. For the first, $w$ is a free variable, and we can't deduce its type without evaluating it. For the latter: $x$ must be of a type, that both: can be evaluated by itself being applied to AND it can be evaluated without a further parameter, as to determine its time. These can't be simultaneously true.
+There exist no context $\Gamma$ or type $T$ for the two latter terms $t$ in the exercise. For the first, $w$ is a free variable, and we can't deduce its type without evaluating it: Or in other words: There is no typing rule that lets us determine its type.
+
+For the latter: $x$ must be of a type, that is both a concrete type, and can be evaluated. Both can't be simultaneously true.
 
 \begin{prooftree}
   \AxiomC{$z : \textbf{A} \in \Gamma, x : \textbf{B}, y : \textbf{C}, z : \textbf{A} $}
@@ -109,7 +111,87 @@ There exist no context $\Gamma$ or type $T$ for the two latter terms $t$ in the 
 \section*{2 Extension with Numbers}
 %===============================================================================
 
+\begin{theorem}
+Preservation of Types under Substitution (9.3.8)
+\begin{prooftree}
+  \AxiomC{$\Gamma, x:S\vdash t:T$}
+  \AxiomC{$\Gamma \vdash s : S$}
+  \BinaryInfC{$\Gamma \vdash t[s/x]:T$}
+\end{prooftree}
+\end{theorem}
+
+\begin{proof}
+Case \textsc{T-Var}:
+
+If $t = x$, then $x : S \to x[s/x] = s : S \Rightarrow $ $t$ and $t[s/x]$ have the same type $S$.
+
+If $t \ne x$, then $t \to t[s/x] : T = t : T$.
+
+\noindent Case \textsc{T-Zero}:
+
+$[s/x]t = \texttt{zero} : \texttt{Nat}$
+
+\noindent Case \textsc{T-Abs}:
+
 TODO
+
+\noindent Case \textsc{T-App}:
+
+TODO
+
+\noindent Case \textsc{T-Succ}:
+
+If $t = x$, then $S = \texttt{Nat} \Rightarrow x:\texttt{Nat} \to x[s/x] = s : \texttt{Nat}$.
+
+If $t \ne x$, then $t[s/x] = t : \texttt{Nat}$
+
+\end{proof}
+
+%===============================================================================
+
+\begin{theorem}
+Progress (9.3.5)\\
+Let $t$ be a closed, well-typed term, that is $\vdash t:T$ for some $T$, then either $t$ is a value or there is some $t'$ with $t\to t'$.
+\end{theorem}
+
+\begin{proof}
+\textsc{T-Var} does not apply, because not closed. \textsc{T-Zero}, \textsc{T-Abs}, \textsc{T-Succ} are values by definition.
+
+For \textsc{T-App}, because of the rules axioms $\Gamma \vdash t_1 : T_{11} \to T_{12}$ and $\Gamma \vdash t_2 : T_{11}$, it follows that $t_1\,t_2 : T_{12} \to [x/t_2]t_1 : T_{12}$.
+\end{proof}
+
+%===============================================================================
+
+\begin{theorem}
+Preservation (9.3.9) \\
+If $\Gamma \vdash t:T$ and $t\to t'$, then $\Gamma \vdash t' : T$.
+\end{theorem}
+
+\begin{proof}
+\textsc{T-Var}, \textsc{T-Zero} and \textsc{T-Abs} don't apply, because there are no derivation rules for them.
+
+\noindent Case \textsc{T-Succ}:
+
+\begin{align}
+& t : \texttt{Nat} \\
+& t' = \texttt{succ}\,t_1 : \texttt{Nat}
+\end{align}
+
+Because $t$ and $t'$ have the same type \texttt{Nat} and $t \to t'$, \textsc{E-Succ} applies.
+
+\noindent Case \textsc{T-App} $t_1 \to t_1'$:
+
+TODO
+
+\noindent Case \textsc{T-App} $t_1 = v_1 \land t_2\to t_2'$:
+
+TODO
+
+\noindent Case \textsc{T-App} $t_1 = (\lambda x : T.t_{12})\land t_2 = v_2$:
+
+TODO
+
+\end{proof}
 
 %===============================================================================
 \section*{3 Environments and free variables}
