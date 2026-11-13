@@ -197,13 +197,143 @@ TODO
 \section*{3 Environments and free variables}
 %===============================================================================
 
-TODO
+Exercise 1 follows from Exercise 2. Therefore I first prove Exercise 2 (Theorem \ref{thm:3-2}) and afterwards Exercise 1 (Theorem \ref{thm:3-1}).
+
+\begin{theorem}\label{thm:3-2}
+If $\Gamma \vdash t: T$, then $FV(t) \subseteq dom(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+
+\noindent Case \textsc{T-Var}
+
+If $t=x$, then $FV(x) = \{x\}$ and $x \in dom(\Gamma)$. Therefore $FV(t) \subseteq dom(\Gamma)$.
+
+\noindent Case \textsc{T-Abs}
+
+If $t=\lambda x : S. u$, then $FV(t) = FV(u) \setminus \{x\}$.
+
+Apply theorem hypothesis to $u \Rightarrow FV(u) \subseteq dom(\Gamma) \cup \{x\}$.
+
+Therefore: $FV(t) = FV(u) \setminus \{x\} \subseteq (dom(\Gamma) \cup \{x\}) \setminus \{x\} = dom(\Gamma)$.
+
+\noindent Case \textsc{T-App}
+
+Very similar to Case \textsc{T-Abs}.
+
+If $t= t_1\,t_2$, then $FV(t) = FV(t_1) \cup FV(t_2)$.
+
+If $t_1=\lambda x : S. u_1$, then $FV(t) = FV(u_1) \setminus \{x\}$.
+
+Apply theorem hypothesis to $u_1 \Rightarrow FV(u_1) \subseteq dom(\Gamma) \cup \{x\}$.
+
+Therefore: $FV(t_1) = FV(u_1) \setminus \{x\} \subseteq (dom(\Gamma) \cup \{x\}) \setminus \{x\} = dom(\Gamma)$.
+
+Analog for $t_2=\lambda x : S. u_2$.
+
+Therefore: $FV(t) = FV(t_1) \cup FV(t_2) \subseteq dom(\Gamma) \cup dom(\Gamma) = dom(\Gamma)$
+
+\end{proof}
+
+
+\begin{theorem}\label{thm:3-1}
+If $\Gamma \vdash t: T$, and $x \notin dom(\Gamma)$, then for all values $v$ we have $t[v/x]=t$.
+\end{theorem}
+
+\begin{proof}
+
+Position Theorem \ref{thm:3-2} : $v\in FV(t) \to v \in dom(\Gamma)$
+
+Counterposition: $v \notin dom(\Gamma) \to v\notin FV(t)$
+
+Therefore: $\forall v, t[v/x]=t$
+
+\end{proof}
 
 %===============================================================================
 \section*{4 Compilation to untyped lambda calculus}
 %===============================================================================
 
-TODO
+\begin{theorem}\label{thm:4-1}
+$\llbracket v \rrbracket$ is a value.
+\end{theorem}
+
+\begin{proof} Case $\llbracket x \rrbracket$ and $x$ is a value
+
+$\llbracket x \rrbracket = x$. Therefore $\llbracket x \rrbracket$ is a value.
+
+\noindent Case $\llbracket \lambda x:T.t \rrbracket$
+
+If $t$ is a value, then $\llbracket \lambda x:T.t \rrbracket := \lambda x.\llbracket t \rrbracket = t$ is a value.
+
+If $t$ is not a value, then by theorem hypothesis $\llbracket t \rrbracket$ is a value.
+
+Therefore $\lambda x.\llbracket t \rrbracket$ is in the form $\lambda x.t$ (Figure 5.3 in the Book), and thus a value.
+
+\noindent Case $\llbracket \texttt{true} \rrbracket$
+
+$\llbracket \texttt{true} \rrbracket := \lambda x.\lambda y.x$ is in the form $\lambda x.t$ (Figure 5.3 in the Book) and is therefore a value.
+
+\noindent Case $\llbracket \texttt{false} \rrbracket$
+
+Analog to case $\llbracket \texttt{true} \rrbracket$
+
+\noindent Case $\llbracket t_1\,t_2 \rrbracket$, $\llbracket \texttt{if}\,t_1\,\texttt{then}\,t_2\,\texttt{else}\,t_3 \rrbracket$
+
+The terms are not in the form $\llbracket v \rrbracket$ and thus the theorem does not apply.
+
+\end{proof}
+
+\begin{theorem}\label{thm:4-2}
+If $ t\to  v$ in the calculus above, then $\llbracket t\rrbracket \to^* \llbracket v\rrbracket$ in the untyped call-by-value lambda calculus.
+\end{theorem}
+
+\begin{proof}
+
+Case $\llbracket x \rrbracket$, $\llbracket \lambda x:T.t \rrbracket$, $\llbracket \texttt{true} \rrbracket$, $\llbracket \texttt{false} \rrbracket$
+
+As per Theorem \ref{thm:4-1}, the terms are values, and thus Theorem \ref{thm:4-2} does not apply.
+
+\noindent Case $\llbracket t_1\,t_2 \rrbracket$
+
+Due to call-by-value and the theorem hypothesis, $\llbracket t_1 \rrbracket \to^* \llbracket v_1 \rrbracket$
+
+$\llbracket v_1\,t_2 \rrbracket \to \llbracket v_1[t_2/x] \rrbracket$
+
+Due to the \textit{progress} theorem, $v_1[t_2/x]$ either is a value, or $\to^*$ reduces it to a value.
+
+Therefore $\llbracket v_1\,t_2 \rrbracket \to^* \llbracket v \rrbracket$
+
+$\llbracket v_1\,t_2 \rrbracket := \llbracket v_1 \rrbracket\,\llbracket t_2 \rrbracket$
+
+Then $\llbracket v_1 \rrbracket\,\llbracket t_2 \rrbracket \to \llbracket v_1 \rrbracket[\llbracket t_2 \rrbracket/x]$
+
+Then the exercise allows us to assume $\llbracket v_1 \rrbracket[\llbracket t_2 \rrbracket/x] = \llbracket v_1 [t_2 /x]\rrbracket$
+
+This reproduces the case above and we get $\llbracket v_1\,t_2 \rrbracket := \llbracket v_1 \rrbracket\,\llbracket t_2 \rrbracket \to^* \llbracket v \rrbracket$
+
+\noindent Case $\llbracket \texttt{if}\,t_1\,\texttt{then}\,t_2\,\texttt{else}\,t_3 \rrbracket$
+
+If $t_1 = \texttt{true}$, then \textsc{E-IfTrue} applies:
+
+$\llbracket \texttt{if}\,t_1\,\texttt{then}\,t_2\,\texttt{else}\,t_3 \rrbracket\to \llbracket t_2 \rrbracket$
+
+As per theorem hypothesis, $t_2 \to^* v$.
+
+If $t_1 = \texttt{false}$, then \textsc{E-IfFalse} applies. Analog to $t_1 = \texttt{true}$.
+
+Assuming a typo in the exercise, \textsc{E-If} is actually
+
+\begin{prooftree}
+  \AxiomC{$t_1 \to t_1'$}
+  \UnaryInfC{$\texttt{if}\,t_1\,\texttt{then}\,t_2\,\texttt{else}\,t_3 \to \texttt{if}\,t_1'\,\texttt{then}\,t_2\,\texttt{else}\,t_3$}
+\end{prooftree}
+
+Then, due to the \textit{preservation} theorem, $t_1 : T \to^* t_1' : T$, $t_1$ eventually reduces to \texttt{true} or \texttt{false}.
+
+Then the cases above apply.
+
+\end{proof}
 
 %===============================================================================
 \section*{5 Types and Programming Languages}
