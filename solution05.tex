@@ -111,7 +111,7 @@ For the latter: $x$ must be of a type, that is both a concrete type, and can be 
 \section*{2 Extension with Numbers}
 %===============================================================================
 
-\begin{theorem}
+\begin{theorem}\label{thm:2-substitution}
 Preservation of Types under Substitution (9.3.8)
 \begin{prooftree}
   \AxiomC{$\Gamma, x:S\vdash t:T$}
@@ -133,11 +133,39 @@ $[s/x]t = \texttt{zero} : \texttt{Nat}$
 
 \noindent Case \textsc{T-Abs}:
 
-TODO
+Assume $t = \lambda y:T_2.t_1$
+
+and $T = T_2\to T_1$
+
+and $\Gamma, x:S,y:T_2 \vdash t_1 :T_1$
+
+then using permutation we get $\Gamma, y:T_2,x:S \vdash t_1 : T_1$.
+
+Using weakening we get $\Gamma, y_T_2 \vdash s : S$
+
+Using induction hypothesis we get $\Gamma, y:T_2 \vdash t_1[s/x]$
+
+By \textsc{T-Abs} we get $\Gamma \vdash \lambda:T_2.t_1[s/x] : T_2\to T_1$
+
+Thus $t[s/x] = \lambda:T_1.t_1[s/x]$.
 
 \noindent Case \textsc{T-App}:
 
-TODO
+Assume $t = t_1\,t_2$
+
+and $\Gamma, x:S \vdash t_y : T_2 \to T_1$
+
+and $\Gamma, x : S \vdash t_2 : T_2$
+
+and $T = t_1$
+
+then by induction hypothesis $\Gamma \vdash t_1[s/x] : T_2 \to T_1$
+
+and $\Gamma \vdash t_2[s/x] : T_2$.
+
+Using \textsc{T-App} we get $\Gamma \vdash t_1[s/x] t_2[s/x]: T$
+
+i.e. $\Gamma \vdash (t_1 t_2)[s/x] : T$
 
 \noindent Case \textsc{T-Succ}:
 
@@ -181,15 +209,27 @@ Because $t$ and $t'$ have the same type \texttt{Nat} and $t \to t'$, \textsc{E-S
 
 \noindent Case \textsc{T-App} $t_1 \to t_1'$:
 
-TODO
+By the theorem hypothesis, $t_1$ must have the same type as $t_1'$.
+
+Using Theorem \ref{thm:2-substitution}, $t_1\,t_2$ has the same type as $t_1'\,t_2$.
+
+\textsc{E-App1} applies.
 
 \noindent Case \textsc{T-App} $t_1 = v_1 \land t_2\to t_2'$:
 
-TODO
+By the theorem hypothesis, $t_2$ must have the same type as $t_2'$.
+
+Using Theorem \ref{thm:2-substitution}, $v_1\,t_2$ has the same type as $v_1\,t_2'$.
+
+\textsc{E-App2} applies.
 
 \noindent Case \textsc{T-App} $t_1 = (\lambda x : T.t_{12})\land t_2 = v_2$:
 
-TODO
+Due to the axioms, $t_1$ is of type $T_{11}\to T_{12}$ and $t_2 = v_2$ of type $T_{11}$.
+
+So $v_1$ can be applied to $\lambda x : T.t_{12}$, and the reduced term is of type $T_{12}$.
+
+\textsc{E-AppAbs} applies.
 
 \end{proof}
 
@@ -329,7 +369,7 @@ Assuming a typo in the exercise, \textsc{E-If} is actually
   \UnaryInfC{$\texttt{if}\,t_1\,\texttt{then}\,t_2\,\texttt{else}\,t_3 \to \texttt{if}\,t_1'\,\texttt{then}\,t_2\,\texttt{else}\,t_3$}
 \end{prooftree}
 
-Then, due to the \textit{preservation} theorem, $t_1 : T \to^* t_1' : T$, $t_1$ eventually reduces to \texttt{true} or \texttt{false}.
+Then, due to the \textit{preservation} theorem, $t_1 : T \to^* t_1' : T$, $t_1$ reduces to \texttt{true} or \texttt{false}.
 
 Then the cases above apply.
 
