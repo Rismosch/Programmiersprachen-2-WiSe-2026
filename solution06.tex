@@ -1,0 +1,208 @@
+\documentclass[13pt, a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bussproofs}
+\usepackage{fancyhdr}
+\usepackage[margin=3cm]{geometry}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header: left, center, right
+\fancyhead[L]{Programming Languages 2}
+\fancyhead[C]{Homework 06}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+Simon Sutoris 7542170
+
+%===============================================================================
+\section*{1 STLC with Extensions}
+%===============================================================================
+
+\begin{enumerate}
+
+\item % 1
+$\texttt{NN} = \texttt{Nat}\times\texttt{Nat}$
+
+\begin{prooftree}
+  \AxiomC{$b:\texttt{Bool} \in p : \texttt{NN}, b:\texttt{Bool}$}
+  %\RightLabel{\textsc{T-Var}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash b:\texttt{Bool}$}
+  \AxiomC{$p : \texttt{NN} \in p : \texttt{NN}, b:\texttt{Bool}$}
+  %\RightLabel{\textsc{T-Var}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash p : \texttt{NN}$}
+  %\RightLabel{\textsc{T-Proj1}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash p.1 : \texttt{Nat}$}
+  %\RightLabel{\textsc{T-IsZero}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash \texttt{iszero}\,p.1 : \texttt{Bool}$}
+  \AxiomC{$p : \texttt{NN} \in p : \texttt{NN}, b:\texttt{Bool}$}
+  %\RightLabel{\textsc{T-Var}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash p : \texttt{NN}$}
+  %\RightLabel{\textsc{T-Proj2}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash p.2 : \texttt{Nat}$}
+  %\RightLabel{\textsc{T-IsZero}}
+  \UnaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash \texttt{iszero}\,p.2 : \texttt{Bool}$}
+  %\RightLabel{\textsc{T-If}}
+  \TrinaryInfC{$p : \texttt{NN}, b:\texttt{Bool} \vdash \texttt{if}\,b\,\texttt{then}\,(\texttt{iszero}\,p.1)\,\texttt{else}\,(\texttt{iszero}\,p.2) : \texttt{Bool}$}
+  %\RightLabel{\textsc{T-Abs}}
+  \UnaryInfC{$p : \texttt{NN} \vdash \lambda b : \texttt{Bool}.\texttt{if}\,b\,\texttt{then}\,(\texttt{iszero}\,p.1)\,\texttt{else}\,(\texttt{iszero}\,p.2): \texttt{Bool} \to \texttt{Bool}$}
+\end{prooftree}
+
+\item % 2
+$\texttt{NB} = \texttt{Nat}+\texttt{B}$
+
+\begin{prooftree}
+  \AxiomC{$x : \texttt{NB} \in x : \texttt{NB}$}
+  \UnaryInfC{$x:\texttt{NB}\vdash x : \texttt{NB}$}
+  \AxiomC{$y: \texttt{Nat} \in x:\texttt{NB}, y: \texttt{Nat}$}
+  \UnaryInfC{$x:\texttt{NB}, y: \texttt{Nat} \vdash y: \texttt{Nat}$}
+  \UnaryInfC{$x:\texttt{NB}, y: \texttt{Nat} \vdash \texttt{iszero}\,y : \texttt{Bool}$}
+  \AxiomC{$z : \texttt{Bool} \in x:\texttt{NB}, z: \texttt{Bool}$}
+  \UnaryInfC{$x:\texttt{NB}, z: \texttt{Bool} \vdash z : \texttt{Bool}$}
+  \TrinaryInfC{$x:\texttt{NB}\vdash (\texttt{case}\,x\,\texttt{of}\,\texttt{inl} y \Rightarrow \texttt{iszero}\,y \mid \texttt{inr}\,z \Rightarrow z) : \texttt{Bool}$}
+  \UnaryInfC{$\vdash \lambda x : \texttt{NB}.(\texttt{case}\,x\,\texttt{of}\,\texttt{inl} y \Rightarrow \texttt{iszero}\,y \mid \texttt{inr}\,z \Rightarrow z) : \texttt{NB} \to \texttt{Bool}$}
+\end{prooftree}
+
+\item % 3
+The exercise does not ask for a type derivation, but a term $t : \textbf{A}+(\textbf{A}\times\textbf{A})$:
+
+\begin{prooftree}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{$x : \textbf{A} \vdash ? : \textbf{A}+(\textbf{A}\times\textbf{A})$}
+  \UnaryInfC{$\vdash \lambda x : \textbf{A}.?:\textbf{A}\to (\textbf{A}+(\textbf{A}\times\textbf{A}))$}
+\end{prooftree}
+
+Any $t$ with the type $\textbf{A}+(\textbf{A}\times\textbf{A})$ suffice. Two terms I have foud by just plugging stuff in:
+
+\begin{enumerate}
+\item $\texttt{inl}\,x : \textbf{A}+(\textbf{A}\times\textbf{A})$
+\item $\texttt{inr}\,\{x, x\} : \textbf{A}+(\textbf{A}\times\textbf{A})$
+\end{enumerate}
+
+\item % 4
+The exercise appears to be malformed. $t_0$ appears to be a record, while the \texttt{case-of} term expects a variant type.
+
+\begin{prooftree}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{$\vdash \texttt{case}\,\{a = \texttt{true},b = \texttt{false}\}\,\texttt{of} <a=x> \Rightarrow x : ?$}
+\end{prooftree}
+
+\item % 5
+Derivation:
+
+\begin{prooftree}
+  \AxiomC{$p : <c:\texttt{Nat}> \in p : <c:\texttt{Nat}>$}
+  \UnaryInfC{$p : <c:\texttt{Nat}> \vdash p : <c:\texttt{Nat}>$}
+  \AxiomC{$x: \texttt{Nat} \in p : <c:\texttt{Nat}>,x: \texttt{Nat} $}
+  \UnaryInfC{$p : <c:\texttt{Nat}>,x: \texttt{Nat} \vdash x: \texttt{Nat}$}
+  \UnaryInfC{$p : <c:\texttt{Nat}>,x: \texttt{Nat} \vdash \texttt{succ}\,x : \texttt{Nat}$}
+  \BinaryInfC{$p : <c:\texttt{Nat}> \vdash \texttt{case}\,p\,\texttt{of}\, <c=x> \Rightarrow \texttt{succ}\,x:\texttt{Nat}$}
+\end{prooftree}
+
+\end{enumerate}
+
+%===============================================================================
+\section*{2 The \texttt{Option} type}
+%===============================================================================
+
+\begin{enumerate}
+
+\item % 1
+
+\texttt{None} and \texttt{Some} $t$ are values. But \texttt{case-of} can be evaluated with the following rules:
+
+\begin{prooftree}
+  \AxiomC{$t_1 \to t'_1$}
+  \RightLabel{\textsc{E-CaseEval}}
+  \UnaryInfC{$\texttt{case}\,t_1\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3 \to \texttt{case}\,t'_1\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3$}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$$}
+  \RightLabel{\textsc{E-CaseNone}}
+  \UnaryInfC{$\texttt{case}\,\texttt{None}\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3 \to t_2$}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$$}
+  \RightLabel{\textsc{E-CaseSome}}
+  \UnaryInfC{$\texttt{case}\,\texttt{Some}\,v_1\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3 \to [x\mapsto v_1]t_3$}
+\end{prooftree}
+
+\item % 2
+Typing rules:
+
+\begin{prooftree}
+  \AxiomC{$$}
+  \RightLabel{\textsc{T-None}}
+  \UnaryInfC{$\vdash \texttt{None} : \texttt{Option}\,T$}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$\Gamma \vdash t : T$}
+  \RightLabel{\textsc{T-Some}}
+  \UnaryInfC{$\Gamma \vdash \texttt{Some}\, t : \texttt{Option}\,T$}
+\end{prooftree}
+
+\begin{prooftree}
+  \AxiomC{$\Gamma \vdash t_1 : \texttt{Option}\,T_1$}
+  \AxiomC{$\Gamma \vdash t_2 : T_2$}
+  \AxiomC{$\Gamma, x: T_1 \vdash t_3 : T_2$}
+  \RightLabel{\textsc{T-Case}}
+  \TrinaryInfC{$\Gamma \vdash \texttt{case}\,t_1\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3 : T_2$}
+\end{prooftree}
+
+\item % 3
+
+\begin{theorem}\label{thm:2-progress}
+Progress: Let $t$ be a closed, well-typed term, that is $\vdash t:T$ for some $T$, then either $t$ is a value or there is some $t'$ with $t\to t'$.
+\end{theorem}
+\begin{proof}
+
+Case \textsc{T-None}: Term is a value
+
+Case \textsc{T-Some}: Term is a value
+
+Case \textsc{T-Case}: Induction over \textsc{T-Case}
+\end{proof}
+
+\begin{theorem}\label{thm:2-progress}
+Preservation: If $\Gamma \vdash t:T$ and $t\to t'$, then $\Gamma \vdash t' : T$.
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+
+\end{enumerate}
+
+%===============================================================================
+\section*{3 Implementation}
+%===============================================================================
+
+TODO
+
+%===============================================================================
+\section*{4 Substructural type systems}
+%===============================================================================
+
+TODO
+
+%===============================================================================
+\section*{5 Types and Programming Languages}
+%===============================================================================
+
+No questions.
+
+\end{document}
