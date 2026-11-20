@@ -120,7 +120,13 @@ Derivation:
 
 \item % 1
 
-\texttt{None} and \texttt{Some} $t$ are values. But \texttt{case-of} can be evaluated with the following rules:
+Evaluation rules:
+
+\begin{prooftree}
+  \AxiomC{$t \to t'$}
+  \RightLabel{\textsc{E-SomeEval}}
+  \UnaryInfC{$\texttt{Some}\,t \to \texttt{Some}\,t'$}
+\end{prooftree}
 
 \begin{prooftree}
   \AxiomC{$t_1 \to t'_1$}
@@ -170,18 +176,36 @@ Progress: Let $t$ be a closed, well-typed term, that is $\vdash t:T$ for some $T
 \end{theorem}
 \begin{proof}
 
-Case \textsc{T-None}: Term is a value
+Straightforward induction on typing derivations. In the cases \textsc{T-None} and \textsc{T-Some}, the term is a value. The only case remaining is \textsc{T-Case}. There exist only 3 cases
 
-Case \textsc{T-Some}: Term is a value
+\begin{enumerate}
+\item $t_1$ is \texttt{None}, in which case \textsc{E-CaseNone} applies
+\item $t_1$ is \texttt{Some} $v_1$, in which case \textsc{E-CaseSome} applies and
+\item $t_1$ is a reducible term, in which case we can perform inductino over either \textsc{E-SomeEval} or \textsc{E-CaseEval}.
+\end{enumerate}
 
-Case \textsc{T-Case}: Induction over \textsc{T-Case}
 \end{proof}
 
 \begin{theorem}\label{thm:2-progress}
 Preservation: If $\Gamma \vdash t:T$ and $t\to t'$, then $\Gamma \vdash t' : T$.
 \end{theorem}
 \begin{proof}
-TODO
+Induction on a derivation of $t:T$. At each step of the induction, we assume that the desired property holds for all suberivations.
+
+\textit{Case} \textsc{T-None}: $t = \texttt{None}, T = \texttt{Option}\,T$
+
+If the last rule in the derivation is \textsc{T-None}, then we know $t$ must be the constant \texttt{None}, which has the type $\texttt{Option}\,T$. This means $t$ is a value and the theorem doesn't apply.
+
+\textit{Case} \textsc{T-Some}: $t = \texttt{Some}\,x, T = \texttt{Option}\,T$
+
+If the last rule in the derivation is \textsc{T-Some}, then we know $x$ must either be a value or an evaluable term. If $x$ is a value, then $t$ is a value and the theorem does not apply. If $x$ is an evaluable term, \textsc{E-SomeEval} applies. Due to the induction hypothesis, $t$ and $t'$ have the same type, so the requirements for the theorem are satisfied.
+
+\textit{Case} \textsc{T-Case}: $t= \texttt{case}\,t_1\,\texttt{of}\,\texttt{None}\Rightarrow t_2 \mid \texttt{Some}\, x \Rightarrow t_3, T = T_2$
+
+If $t_1$ is an evaluable term, \textsc{E-CaseEval} applies: $t-1 \to t'_1$. Due to te first axiom of \textsc{T-Case}, $t_1$ and $t'_1$ must have the same type and the theorem requirements are satisfied.
+
+If $t_1$ is a value, it's either \texttt{None} or \texttt{Some} $v_1$. In the first, \textsc{E-CaseNone} applies, which due to the second axiom of \textsc{T-Case}, requires $t_2$ to be of type $T_2$, which satisfies the theorem requirements. In the latter, \textsc{E-CaseSome} applies, which due to the third axiom of \textsc{T-Case}, requires $t_3$ to be of type $T_2$, which satisfies the theorem requirements.
+
 \end{proof}
 
 
