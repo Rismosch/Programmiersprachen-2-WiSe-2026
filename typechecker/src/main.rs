@@ -19,6 +19,10 @@ enum Term {
         lhs: Box<Term>,
         rhs: Box<Term>,
     },
+    Sequence {
+        lhs: Box<Term>,
+        rhs: Box<Term>,
+    },
 }
 
 //==============================================================================
@@ -45,6 +49,7 @@ impl std::fmt::Display for Term {
                 term,
             } => write!(f, "(λ{} : {}.{})", variable, variable_type, term),
             Self::Application { lhs, rhs } => write!(f, "({} {})", lhs, rhs),
+            Self::Sequence { lhs, rhs } => write!(f, "({}; {})", lhs, rhs),
         }
     }
 }
@@ -108,19 +113,34 @@ impl Term {
 
                 let Type::Function(type_in, type_out) = type_lhs else {
                     return TypeDeriveError::new(format!(
-                        "expected `{}` to be a function type but was `{}`",
+                        "expected term `{}` to be a function type but was `{}`",
                         lhs, type_lhs,
                     ));
                 };
 
                 if *type_in != type_rhs {
                     return TypeDeriveError::new(format!(
-                        "expected `{}` to be of type `{}` but was `{}`",
+                        "expected term `{}` to be of type `{}` but was `{}`",
                         rhs, type_in, type_rhs,
                     ));
                 }
 
                 Ok(*type_out)
+            }
+            Term::Sequence { lhs, rhs } => {
+                let type_lhs = lhs.derive_type(type_context.clone())?;
+                let type_rhs = rhs.derive_type(type_context.clone())?;
+
+                if type_lhs != Type::Unit {
+                    return TypeDeriveError::new(format!(
+                        "expected term `{}` to be of type `{}` but was `{}`",
+                        lhs,
+                        Type::Unit,
+                        type_lhs,
+                    ));
+                }
+
+                Ok(type_rhs)
             }
         }
     }
@@ -212,6 +232,49 @@ fn main() {
         Term::Application {
             lhs: Box::new(Term::Variable("x".to_string())),
             rhs: Box::new(Term::Variable("y".to_string())),
+        },
+    );
+
+    // sequence extension
+    eprintln!();
+    eprintln!("sequence extension:");
+    print_and_derive(
+        [("x".to_string(), Type::Unit), ("y".to_string(), Type::Unit)].into(),
+        Term::Sequence {
+            lhs: Box::new(Term::Variable("x".to_string())),
+            rhs: Box::new(Term::Variable("y".to_string())),
+        },
+    );
+    print_and_derive(
+        [
+            (
+                "x".to_string(),
+                Type::Function(Box::new(Type::Unit), Box::new(Type::Unit)),
+            ),
+            ("y".to_string(), Type::Unit),
+        ]
+        .into(),
+        Term::Sequence {
+            lhs: Box::new(Term::Variable("x".to_string())),
+            rhs: Box::new(Term::Variable("y".to_string())),
+        },
+    );
+    print_and_derive(
+        [("y".to_string(), Type::Unit)].into(),
+        Term::Sequence {
+            lhs: Box::new(Term::Application {
+                lhs: Box::new(Term::Abstraction {
+                    variable: "x".to_string(),
+                    variable_type: Type::Unit,
+                    term: Box::new(Term::Variable("x".to_string())),
+                }),
+                rhs: Box::new(Term::Variable("y".to_string())),
+            }),
+            rhs: Box::new(Term::Abstraction {
+                variable: "x".to_string(),
+                variable_type: Type::Unit,
+                term: Box::new(Term::Variable("x".to_string())),
+            }),
         },
     );
 }
