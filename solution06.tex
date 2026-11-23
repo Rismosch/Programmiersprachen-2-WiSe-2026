@@ -224,16 +224,75 @@ For my implementation, see \url{https://github.com/Rismosch/Programmiersprachen-
 \begin{enumerate}
   
 \item % 1
-TODO
+\begin{theorem}\label{thm:4-exchange}
+%If $\Gamma_a,x_a:_1T_a,x_b:_1T_b,\Gamma_b \vdash t:T$, then $\Gamma_a,x_b:_1T_b,x_a:_aT_a,\Gamma_b \vdash t:T$.
+If $\Gamma_a,x_a:_1T_a,x_b:_1T_b,\Gamma_b \vdash t:T$, then $\Gamma_a,x_b:_1T_b,x_a:_1T_a,\Gamma_b \vdash t:T$.
+\end{theorem}
+\begin{proof}
+
+We can eliminate common terms using the Context Splitting rules. In the last step we use the comment in the last bullet point, which states:
+
+\begin{quote}
+Note that, although we write $\Gamma = \Gamma_1 \circ \Gamma_2$, the order in $\Gamma$ is \textit{not} uniquely determined by $\Gamma_1$ and $\Gamma_2$
+\end{quote}
+
+It allows us to reorder terms to produce the same equation on both sides of the equal sign.
+
+\begin{align}
+\Gamma_a,x_a:_1T_a,x_b:_1T_b,\Gamma_b &= \Gamma_a,x_b:_1T_b,x_a:_1T_a,\Gamma_b \\
+\Gamma_a\circ(x_a:_1T_a,x_b:_1T_b) \circ \Gamma_b &= \Gamma_a\circ(x_b:_1T_b,x_a:_1T_a) \circ \Gamma_b \\
+x_a:_1T_a,x_b:_1T_b &= x_b:_1T_b,x_a:_1T_a \\
+(x_a:_1T_a) \circ (x_b:_1T_b) &= (x_b:_1T_b) \circ (x_a:_1T_a) \\
+(x_a:_1T_a) \circ (x_b:_1T_b) &= (x_a:_1T_a) \circ (x_b:_1T_b)
+\end{align}
+
+\end{proof}
   
 \item % 2
-TODO
+\begin{theorem}\label{thm:4-exchange}
+Weakening does not hold.
+\end{theorem}
+\begin{proof}
+Find $\Gamma, x, t, T, T'$ such that $\Gamma \vdash t : T$ and $x\notin\text{dom}(\Gamma)$ but $\Gamma,x:_1T'\vdash t:T$ does \textit{not} hold.
+
+Chose:
+
+\begin{align}
+  \Gamma &= \emptyset\\
+  x &= y\\
+  t &= z\\
+  T &= A\\
+  T' &= A\\
+\end{align}
+
+The term is well typed:
+
+\begin{prooftree}
+  \AxiomC{$$}
+  \RightLabel{\textsc{T-Var}}
+  \UnaryInfC{$z:_1 A \vdash z : A$}
+\end{prooftree}
+
+But using weakening not:
+
+\begin{prooftree}
+  \AxiomC{$\lightning$}
+  \UnaryInfC{$z:_1 A, y :_1 A \vdash z : A$}
+\end{prooftree}
+
+\textsc{T-Var} only applies when the context only includes the variable of the term. If the type system would have the weakening property, then using it would break well-typed terms.
+
+\end{proof}
   
 \item % 3
-TODO
+Without weakening, we cannot freely add variables to our context. This implies that the variables in our context represent values that we must use in our term.
 
 \item % 4
-TODO
+This is useful for resource management. A value which is introduced must be consumed somehow.
+
+The closest example from my experience is \texttt{std::thread} in C++. The programmer must call \texttt{std::join} (wait for it to finish its execution) or \texttt{std::detach} (permit the thread to execute independetly), thus consuming it. Linearity is enforced at runtime: If a thread is not consumed, the destructor of \texttt{std::thread} will call \texttt{std::terminate}, which ends the entire program. This means the programmer needs to be explicit about how they use the thread.
+
+Rusts ownership model kinda fits, but not quite. Rust allows implicit dropping, which means variables can go out of scope without explicitly dropping them.
 
 \end{enumerate}
 
